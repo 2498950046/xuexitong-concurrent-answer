@@ -1,0 +1,40 @@
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Browser / Selenium runtime files
+.drivers/
+/chromedriver*
+/geckodriver*
+/msedgedriver*
+error.png
+screenshots/
+*.log
+
+# IDE / local workspace files
+.idea/
+.vscode/
+.agents/
+.codex/
+
+# Build / packaging output
+build/
+dist/
+*.egg-info/
+
+# Internal planning notes generated during local development
+docs/superpowers/

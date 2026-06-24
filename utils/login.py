@@ -1,34 +1,33 @@
+from __future__ import annotations
 
-
-from selenium import webdriver
+from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-import time
-import re
+from selenium.webdriver.support.ui import WebDriverWait
 
 
+def login(driver, url: str, phone: str, password: str, timeout: int = 10) -> bool:
+    if not url:
+        raise ValueError("login url is required")
+    if not phone:
+        raise ValueError("phone is required")
+    if not password:
+        raise ValueError("password is required")
 
-
-
-
-
-
-def login(driver,url,phone,password):
-     # 登录流程
     try:
-        # 访问目标网址
         driver.get(url)
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "phone"))).send_keys(phone)
+        WebDriverWait(driver, timeout).until(
+            EC.presence_of_element_located((By.ID, "phone"))
+        ).send_keys(phone)
         driver.find_element(By.ID, "pwd").send_keys(password)
         driver.find_element(By.ID, "loginBtn").click()
 
-    # 等待登录完成
-        WebDriverWait(driver, 10).until(EC.url_contains("mooc"))
-        print("登录成功!当前URL:", driver.current_url)
+        WebDriverWait(driver, timeout).until(EC.url_contains("mooc"))
+        print("登录成功! 当前URL:", driver.current_url)
         return True
-    except Exception as e:
-        print(f"登录失败: {str(e)}")
+    except TimeoutException as exc:
+        print(f"登录超时: {exc}")
+        return False
+    except WebDriverException as exc:
+        print(f"登录失败: {exc}")
         return False

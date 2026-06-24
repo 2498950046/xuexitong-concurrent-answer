@@ -1,70 +1,79 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-import time
+from __future__ import annotations
+
 import re
 
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
-#获取网页上的题
-def get_questions(driver):
-    """
-    获取页面上的所有题目及其选项
-    
-    参数:
-        driver: Selenium WebDriver 实例
-        
-    返回:
-        list: 包含所有题目信息的列表，每个题目是一个字典
-    """
-    questions = []
-    
+
+def get_questions(driver, timeout: int = 20) -> list[dict[str, object]]:
+    questions: list[dict[str, object]] = []
+
     try:
-        # 等待题目元素加载完成
-        question_elements = WebDriverWait(driver, 20).until(
+        question_elements = WebDriverWait(driver, timeout).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.questionLi"))
         )
-        
+
         for question in question_elements:
-            # 获取题目基本信息
             question_id = question.get_attribute("id")
             question_type = question.get_attribute("typename")
-            
-            # 获取题目文本
-            question_text = question.find_element(By.TAG_NAME, "h3").text
-            # 清理题目文本，移除序号和题型提示
-            question_text = re.sub(r'^\d+\.\s*$.*?$\s*', '', question_text).strip()
-            
-            
-            # 获取选项
+            question_text = _clean_question_text(question.find_element(By.TAG_NAME, "h3").text)
+
             options = []
-      
             option_elements = WebDriverWait(question, 10).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.stem_answer div.answerBg"))
+                EC.presence_of_all_elements_located(
+                    (By.CSS_SELECTOR, "div.stem_answer div.answerBg")
+                )
             )
-            for option in option_elements:
-                option_letter = option.find_element(By.CSS_SELECTOR, "span.num_option").get_attribute("data")
-                # option_text = option.find_element(By.CSS_SELECTOR, "div.answer_p p").text
-                # 使用更通用的文本提取方式
-                option_text = option.find_element(By.CSS_SELECTOR, "div.answer_p").get_attribute("textContent").strip()
-                options.append({
-                    "letter": option_letter,
-                    "text": option_text
-                })
-            
-            # 构建题目字典
-            questions.append({
-                "id": question_id,
-                "type": question_type,
-                "text": question_text,
-                "options": options
-            })
-            
+
+            for index, option in enumerate(option_elements):
+                options.append(
+                    {
+                        "letter": _extract_option_letter(option, index),
+                        "text": _extract_option_text(option),
+                    }
+                )
+
+            questions.append(
+                {
+                    "id": question_id,
+                    "type": question_type,
+                    "text": question_text,
+                    "options": options,
+                }
+            )
+
         print(f"成功获取 {len(questions)} 道题目")
         return questions
-        
-    except Exception as e:
-        print(f"获取题目失败: {str(e)}")
-        return None
+    except TimeoutException:
+        print("获取题目超时")
+        return []
+    except WebDriverException as exc:
+        print(f"获取题目失败: {exc}")
+        return []
+
+
+def _clean_question_text(text: str) -> str:
+    cleaned = re.sub(r"^\s*\d+[.、]?\s*", "", text or "")
+    return cleaned.strip()
+
+
+def _extract_option_letter(option, index: int) -> str:
+    selectors = ("span.num_option", "span.num_option_dx")
+    for selector in selectors:
+        try:
+            letter = option.find_element(By.CSS_SELECTOR, selector).get_attribute("data")
+            if letter:
+                return letter.strip().upper()
+        except NoSuchElementException:
+            continue
+    return chr(65 + index)
+
+
+def _extract_option_text(option) -> str:
+    try:
+        return option.find_element(By.CSS_SELECTOR, "div.answer_p").get_attribute("textContent").strip()
+    except NoSuchElementException:
+        return ""
