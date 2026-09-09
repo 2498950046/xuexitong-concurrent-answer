@@ -107,6 +107,8 @@ Ctrl+C
 python finish_work.py
 ```
 
+启动后会优先在终端询问作业网址：输入网址后使用本次输入；直接回车则使用 `.env` 中的 `XUEXITONG_WORK_URL`。
+
 课程导航入口：
 
 ```powershell

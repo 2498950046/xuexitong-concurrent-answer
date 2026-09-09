@@ -6,12 +6,20 @@ from utils.login import login
 from utils.start_browser import start_browser
 
 
+def resolve_work_url(config: AppConfig, input_fn=None) -> str:
+    input_fn = input_fn or input
+    entered_url = input_fn("请输入作业网址（直接回车使用 .env 默认值）: ").strip()
+    work_url = entered_url or config.work_url
+    if not work_url:
+        raise ValueError("Missing XUEXITONG_WORK_URL environment variable and no URL was entered")
+    return work_url
+
+
 def main() -> int:
     print("正在读取配置...", flush=True)
     config = AppConfig.from_env()
     phone, password = config.require_login()
-    if not config.work_url:
-        raise ValueError("Missing XUEXITONG_WORK_URL environment variable")
+    work_url = resolve_work_url(config)
 
     print("配置读取完成，准备启动浏览器...", flush=True)
     driver = start_browser(config)
@@ -19,7 +27,7 @@ def main() -> int:
     if not login(driver, config.login_url, phone, password):
         return 1
 
-    result = answer_homework(driver, config.work_url, config)
+    result = answer_homework(driver, work_url, config)
     return 0 if result.ok else 1
 
 
