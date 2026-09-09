@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security or privacy concern
+    url: https://github.com/2498950046/xuexitong-concurrent-answer/security/advisories/new
+    about: Please report sensitive issues privately.

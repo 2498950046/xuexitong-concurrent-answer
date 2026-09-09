@@ -1,0 +1,45 @@
+name: Bug report
+description: Report a reproducible problem.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not paste passwords, API keys, cookies, or full private course URLs.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: List the exact steps or command that reproduces the issue.
+      placeholder: |
+        1. Run `python batch_homework.py`
+        2. Open ...
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Python version, Chrome version, OS, and Selenium version.
+      placeholder: |
+        OS:
+        Python:
+        Chrome:
+        Selenium:
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      description: Paste only logs with secrets and private URLs removed.
+      render: text

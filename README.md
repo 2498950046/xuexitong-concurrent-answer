@@ -1,5 +1,7 @@
 # Xuexitong Automation
 
+[![tests](https://github.com/2498950046/xuexitong-concurrent-answer/actions/workflows/tests.yml/badge.svg)](https://github.com/2498950046/xuexitong-concurrent-answer/actions/workflows/tests.yml)
+
 基于 Python + Selenium 的超星学习通/Chaoxing 课程与作业自动化辅助脚本。项目支持登录、课程作业页扫描、ChromeDriver 自动匹配、批量作业窗口并发处理，以及关键逻辑的单元测试。
 
 > 请只在你有权限操作的账号和课程中使用。本项目不内置题库、账号、密码或 API Key；涉及作业提交的结果应由使用者自行核对，并遵守学校、课程和平台规则。
@@ -159,3 +161,9 @@ git rm --cached -r utils/__pycache__ .vscode docs/superpowers
 ```
 
 如果真实 API Key 曾经提交到 Git 历史中，请立即到服务商后台作废并重新生成。`.gitignore` 只能防止未来误提交，不能清除已经存在的历史记录。
+
+## 贡献与安全
+
+- 贡献说明见 [CONTRIBUTING.md](CONTRIBUTING.md)
+- 安全与隐私问题见 [SECURITY.md](SECURITY.md)
+- 开源许可证需要仓库所有者确认后再添加 `LICENSE`
